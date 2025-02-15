@@ -22,56 +22,53 @@ Click nbfs://nbhost/SystemFileSystem/Templates/Scripting/EmptyPHPWebPage.php to 
     <body>
         <?php
 
-        class checkout {
+        function validateCard($number) {
 
-            public function validateCard($number) {
+            $cardType = '';
+            $lastFourDigits = substr($number, -4);
 
-
-                $cardType = '';
-                $lastFourDigits = substr($number, -4);
-
-                if (strlen($number) === 13 && substr($number, 0, 1) === '4') {
-                    $cardType = 'VISA';
-                    return [$cardType, $lastFourDigits];
-                } elseif (strlen($number) === 16 && substr($number, 0, 1) === '4') {
-                    $cardType = 'VISA';
-                    return [$cardType, $lastFourDigits];
-                } elseif (strlen($number) === 16 && (substr($number, 0, 2) >= 51 && substr($number, 0, 2) <= 55)) {
-                    $cardType = 'MasterCard';
-                    return [$cardType, $lastFourDigits];
-                } elseif (strlen($number) === 15 && (substr($number, 0, 2) === '34' || substr($number, 0, 2) === '37')) {
-                    $cardType = 'AMEX';
-                    return [$cardType, $lastFourDigits];
-                } else {
-                    return false;
-                }
+            if (strlen($number) === 13 && substr($number, 0, 1) === '4') {
+                $cardType = 'VISA';
+                return [$cardType, $lastFourDigits];
+            } elseif (strlen($number) === 16 && substr($number, 0, 1) === '4') {
+                $cardType = 'VISA';
+                return [$cardType, $lastFourDigits];
+            } elseif (strlen($number) === 16 && (substr($number, 0, 2) >= 51 && substr($number, 0, 2) <= 55)) {
+                $cardType = 'MasterCard';
+                return [$cardType, $lastFourDigits];
+            } elseif (strlen($number) === 15 && (substr($number, 0, 2) === '34' || substr($number, 0, 2) === '37')) {
+                $cardType = 'AMEX';
+                return [$cardType, $lastFourDigits];
+            } else {
+                return false;
             }
-
-            public function display() {
-                echo '<h2>Checkout</h2>';
-                if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-                    $cardNumber = test_input($_POST['card_number']);
-                    list($cardType, $lastFourDigits) = $this->validateCard($cardNumber);
-
-                    if ($cardType) {
-
-                        echo "Your {$cardType} ending with {$lastFourDigits} has been charged \$" . number_format($_SESSION['total'], 2);
-                        session_destroy();
-                    } else {
-
-                        echo "Invalid card. Please check your card number and try again.";
-                    }
-                }
-
-                echo '<form method="post">
-        <p>Enter Credit Card Number: <input type="text" name="card_number" required></p>
-        <button type="submit">Pay</button>
-      </form>';
-            }
+            return [$cardType, $lastFourDigits];
         }
 
-        $checkout = new Checkout();
-        $checkout->display();
+        if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+            $cardNumber = test_input($_POST['card_number']);
+            $validation = validateCard($cardNumber);
+
+            if ($validation) {
+                list($cardType, $lastFourDigits) = $validation;
+                echo "Your {$cardType} ending with {$lastFourDigits} has been charged $" . number_format($_SESSION['total'], 2);
+                session_destroy();
+                exit();
+            } else {
+                $error = "Invalid card number. Please try again.";
+            }
+        }
+        ?>
+        <h2>Checkout</h2>
+        <p>Total to be charged: $<?= number_format($_SESSION['total'], 2) ?></p>
+
+        <form method="post">
+            <p>Enter Credit Card Number: <input type="text" name="card_number" required></p>
+            <button type="submit">Pay</button>
+        </form>
+        <?php
+        if (isset($error))
+            echo "<p style='color:red;'>$error</p>";
         ?>
 
     </body>

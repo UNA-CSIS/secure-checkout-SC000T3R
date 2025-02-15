@@ -39,7 +39,7 @@ Click nbfs://nbhost/SystemFileSystem/Templates/Scripting/EmptyPHPWebPage.php to 
 
         <?php
         if (isset($error))
-            echo "<p>$error</p>";
+            echo "<p style='color:red;'>$error</p>";
         ?>
     </body>
 </html>

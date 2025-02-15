@@ -22,27 +22,28 @@ Click nbfs://nbhost/SystemFileSystem/Templates/Project/PHP/PHPProject.php to edi
     </head>
     <body>
         <?php
+        $products = [
+            1 => ['name' => 'MacBook', 'price' => 1000],
+            2 => ['name' => 'iPhone', 'price' => 600],
+            3 => ['name' => 'AirPods', 'price' => 150]
+        ];
 
-        class Product {
-
-            private $products = [
-                1 => ['name' => 'MacBook', 'price' => 1000],
-                2 => ['name' => 'iPhone', 'price' => 600],
-                3 => ['name' => 'AirPods', 'price' => 150]
-            ];
-
-            public function display() {
-                echo '<h2>Available Products</h2>';
-                echo '<form method="post" action="summary.php">';
-                foreach ($this->products as $id => $product) {
-                    echo "<p>{$product['name']} - \${$product['price']} <input type='number' name='order[{$id}]'</p>";
-                }
-                echo '<button type="submit">Submit Order</button></form>';
-            }
+        if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+            $_SESSION['order'] = $_POST['order'];
+            header('Location: summary.php');
+            exit();
         }
-
-        $product = new Product();
-        $product->display();
         ?>
+
+        <form method = "post">
+            <?php foreach ($products as $id => $product):
+                ?>
+                <p>
+                    <?= $product['name'] ?> - $<?= $product['price'] ?>
+                    <input type="number" name="order[<?= $id ?>]" value="0" min="0">
+                </p>
+            <?php endforeach; ?>
+            <button type="submit">Submit Order</button>
+        </form>
     </body>
 </html>

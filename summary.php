@@ -4,6 +4,16 @@ if (!isset($_SESSION['authenticated'])) {
     header('Location: login.php');
     exit();
 }
+if (!isset($_SESSION['order'])) {
+    header('Location: index.php');
+    exit();
+}
+$products = [
+    1 => ['name' => 'MacBook', 'price' => 1000],
+    2 => ['name' => 'Iphone', 'price' => 600],
+    3 => ['name' => 'AirPods', 'price' => 150]
+];
+$subtotal = 0;
 ?>
 
 <!DOCTYPE html>
@@ -17,46 +27,20 @@ Click nbfs://nbhost/SystemFileSystem/Templates/Scripting/EmptyPHPWebPage.php to 
         <title>summary.php</title>
     </head>
     <body>
-        <?php
+        <h2>Order Summary</h2>
+        <?php foreach ($_SESSION['order'] as $id => $qty): ?>
+            <?php
+            if ($qty > 0):
+                $itemTotal = $products[$id]['price'] * $qty;
+                $subtotal += $itemTotal;
+                ?>
+                <p><?= $products[$id]['name'] ?> x <?= $qty ?> = $<?= number_format($itemTotal, 2) ?></p>
+            <?php endif; ?>
+        <?php endforeach; ?>
 
-        class summary {
+        <?php $_SESSION['subtotal'] = $subtotal; ?>
 
-            public function display() {
-                if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['order'])) {
-                    $_SESSION['order'] = $_POST['order'];
-                }
-
-                if (!isset($_SESSION['order'])) {
-                    header('Location: index.php');
-                    exit();
-                }
-
-                echo '<h2>Order Summary</h2>';
-                $subtotal = 0;
-                $products = [
-                    1 => ['name' => 'MacBook', 'price' => 1000],
-                    2 => ['name' => 'Iphone', 'price' => 600],
-                    3 => ['name' => 'AirPods', 'price' => 150]
-                ];
-
-                foreach ($_SESSION['order'] as $id => $qty) {
-                    if ($qty > 0) {
-                        $itemTotal = $products[$id]['price'] * $qty;
-                        echo "<p>{$products[$id]['name']} x {$qty} = \${$itemTotal}</p>";
-                        $subtotal += $itemTotal;
-                    }
-                }
-
-                $_SESSION['subtotal'] = $subtotal;
-                echo "<p>Subtotal: \$" . number_format($subtotal, 2) . "</p>";
-                echo '<a href="tax.php">Go to Tax Calculation</a>';
-            }
-        }
-
-        $summary = new Summary();
-        $summary->display();
-        ?>
-
-
+        <p>Subtotal: $<?= number_format($subtotal, 2) ?></p>
+        <a href="tax.php">Go to Calculation</a>
     </body>
 </html>
